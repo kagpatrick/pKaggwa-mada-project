@@ -1,14 +1,25 @@
 #raw-data
 
-This folder should contain all raw data. As needed add sub-folders.
+This folder contains a  data-set in an Excel file with variables described below.
 
-Currently, as an example, it contains a simple made-up data-set in an Excel file.
+Gender or sex of the patient
+	Age of the patient in complete years
+	Patient’s weight to find out if he or she lost weight
+	Whether Patient had fever
+	Whether patient smoked
+  Whether patient had asthma
+	Whether patient took alcohol
+	Temperature of the patient then
+	Chest radiography report
+	Exposure to Home fuel for example Gas, Charcoal stove
+  If patient produced sputum
+	If patient has blood in their sputum
+	Oxygen saturation of the patient
+  HIV status of the patient
 
-The dataset contains the variables `Height`, `Weight` and `Gender` of a few imaginary individuals.
 
-The dataset purposefully contains some faulty entries that need to be cleaned.
 
-Generally, any dataset should contain some meta-data explaining what each variable in the dataset is. (This is often called a **Codebook**.) For this simple example, the codebook is given as a second sheet in the Excel file.
 
-This raw data-set should generally not be edited by hand. It should instead be loaded and processed/cleaned using code.
+
+
 

@@ -5,49 +5,82 @@
 #and saves the results to the results folder
 
 #load needed packages. make sure they are installed.
-library(ggplot2) #for plotting
 library(broom) #for cleaning up output from lm()
-library(here) #for data loading/saving
+library(here) #for data loading/saving#load needed packages. make sure they are installed.
+library(tidyverse) #for data processing/cleaning; includes ggplot2, tidyr, readr, dplyr, stringr, purr, forcats
+library(skimr) #for nice visualization of data 
+library(here) #to set paths
+library(renv) #for package management
+library(knitr) #for nice tables
+library(kableExtra) #for nice tables
+library(gt) #for nice tables
+library(gtsummary) #for summary tables
+
 
 #path to data
 #note the use of the here() package and not absolute paths
-data_location <- here::here("data","processed-data","processeddata.rds")
+data_location <- here::here("data","processed-data","madaproject.rds")
 
 #load data. 
-mydata <- readRDS(data_location)
+madaproject <- readRDS(data_location)
 
-
-######################################
-#Data fitting/statistical analysis
-######################################
 
 ############################
-#### First model fit
-# fit linear model using height as outcome, weight as predictor
+## ---- fit-data-logistic --------
 
-lmfit1 <- lm(Height ~ Weight, mydata)  
+# second model has all variables as predictors
+log_mod <- logistic_reg() %>% set_engine("glm")
+logfit <- log_mod %>% fit(tb ~ ., data = madaproject)
 
-# place results from fit into a data frame with the tidy function
-lmtable1 <- broom::tidy(lmfit1)
+# Load required libraries
+library(tidymodels)
+library(pROC)
 
-#look at fit results
-print(lmtable1)
+# Define the logistic regression model with glm engine
+log_mod <- logistic_reg() %>% 
+  set_engine("glm")
 
-# save fit results table  
-table_file1 = here("results", "tables", "resulttable1.rds")
-saveRDS(lmtable1, file = table_file1)
+# Fit the model
+logfit <- log_mod %>% 
+  fit(tb ~ ., data = madaproject)
 
-############################
-#### Second model fit
-# fit linear model using height as outcome, weight and gender as predictor
+# Predict probabilities
+predicted_probabilities <- predict(logfit, new_data = madaproject, type = "prob")
 
-lmfit2 <- lm(Height ~ Weight + Gender, mydata)  
+# Compute ROC curve and AUC
+roc_result <- roc(madaproject$tb, predicted_probabilities$.pred_TB)
 
-# place results from fit into a data frame with the tidy function
-lmtable2 <- broom::tidy(lmfit2)
+# Compute accuracy
+predicted_classes <- ifelse(predicted_probabilities$.pred_TB > 0.5, "Yes", "No")
+accuracy <- mean(predicted_classes == madaproject$tb)
 
-#look at fit results
-print(lmtable2)
+# Display AUC and accuracy
+print(paste("AUC:", round(auc(roc_result), 3)))
+print(paste("Accuracy:", round(accuracy, 3)))
+
+
+
+
+
+
+
+
+# Compute the accuracy and AUC for model 1
+m1_acc <- logfit %>% 
+  predict(madaproject) %>% 
+  bind_cols(madaproject) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric == "accuracy") 
+m1_auc <-  logfit %>%
+  predict(madaproject, type = "prob") %>%
+  bind_cols(madaproject) %>%
+  roc_auc(truth = madaproject$tb, .pred_class)
+
+# Print the results
+print(m1_acc)
+
+print(m1_auc)
+
 
 # save fit results table  
 table_file2 = here("results", "tables", "resulttable2.rds")
