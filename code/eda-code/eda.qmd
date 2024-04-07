@@ -116,45 +116,40 @@ scatter_plot <- ggplot(madaproject, aes(x = oxygencons, y = Age, color = tb)) +
 figure_file = here("results","figures", "age_oxygenconsscatter_plot.png")
 ggsave(filename = figure_file, plot=scatter_plot) 
 ```
-
+Creating a table of characteristics 
 
 ```{r}
+library(dplyr)
+library(gtsummary)
 
+# Convert non-numeric variables to character
+madaproject <- madaproject %>%
+  mutate(across(where(is.factor), as.character))
 
-# Create gtsummary table 
-table1 <- 
-  madaproject %>%
+# Define variables of interest (excluding "Age" and "oxygencons")
+variables <- c("Gender", "Asthma", "Smoke", "Alcohol", "feverstatus", 
+               "Weightloss", "coughstatus", "Sputumproduction", 
+               "BloodinSputum", "cxrconclusion_chestxray", 
+               "homefuel", "hivstatus")
+
+# Create a summary table with specified variable types
+summary_table_characteristics <- madaproject %>%
+  select(all_of(variables), tb) %>%
   tbl_summary(
-    include = all_of(c("Gender", "Asthma", "Smoke", "Alcohol", "feverstatus", 
-                       "Weightloss", "coughstatus", "Sputumproduction", 
-                       "BloodinSputum", "cxrconclusion_chestxray", 
-                       "homefuel", "hivstatus", "tb")),
-    missing = "no",
-    label = list(
-      Asthma ~ "Asthma",
-      Smoke ~ "Smoking Status",
-      Alcohol ~ "Alcohol",
-      feverstatus ~ "Fever Status",
-      Weightloss ~ "Weight Loss",
-      coughstatus ~ "Cough Status",
-      `Sputumproduction` ~ "Sputum Production",
-      `BloodinSputum` ~ "Blood in Sputum",
-      cxrconclusion_chestxray ~ "CXR Conclusion",
-      homefuel ~ "Home Fuel",
-      hivstatus ~ "HIV Status",
-      tb ~ "TB"
-    )
-  ) %>%
-  add_n()
+    by = tb,
+    type = everything() ~ "categorical"
+  )
 
-# Print the table
-table1
-
+# Print the summary table
+summary_table_characteristics 
+ 
 # Save table
-saveRDS(table1, file = here::here("results", "tables", "table1.rds"))
+saveRDS(table1, file = here::here("results", "tables", "summary_table_characteristics .rds"))
 
 
 ```
+
+
 This is just my code to use a for loop 
 ```{r}
 

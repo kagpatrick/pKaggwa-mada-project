@@ -1,0 +1,193 @@
+---
+title: "Predicting of the pulmunary TB cases , Uganda"
+author: "Patrick Kaggwa"
+date: "12/03/2024"
+output: html_document
+---
+
+## Introduction
+
+This script uses tuberculosis(tb) as the outcome of interest and fits the following models to the analysis data:
+
+* Null
+* Decision Tree
+* Random Forest
+* LASSO
+
+It compares the  models, and then finally fits the “best” model to the test data.
+
+<br>
+
+Follow the previous processing and analysis markdowns to generate the analysis data used here.
+
+<br>
+
+Each model will follow this process:
+
+1. Model Specification
+2. Workflow Definition
+3. Tuning Grid Specification
+4. Tuning Using Cross-Validation and the tune_grid() function
+5. Identify Best Model
+6. Model Evaluation
+
+```{r seed=123}
+defaultW <- getOption("warn") 
+options(warn = -1) 
+# load the relevant tidymodels libraries
+library(here) #for data loading/saving
+library(tidyverse) #for data management
+library(tidymodels) #for data modeling
+library(skimr) #for variable summaries
+library(broom.mixed) #for converting bayesian models to tidy tibbles
+library(glmnet) #for lasso models
+library(doParallel) #for parallel backend for tuning processes
+library(ranger) #for random forest models
+library(yardstick)
+options(warn = defaultW)
+
+```
+
+## Load the data.
+
+```{r}
+#Path to data. Note the use of the here() package and not absolute paths
+data_location <- here::here("data","processed-data","madaproject.rds")
+#load data
+# Loading the needed dataset
+madaproject <- readRDS(data_location)
+colnames(madaproject)
+```
+
+Before I start doing some model building I split the data into training and testing datasets.
+
+```{r}
+#Set a seed
+rngseed = 5002
+set.seed(rngseed)
+data_split <- initial_split(madaproject, prop = 0.7)
+train <- training(data_split)
+test <- testing(data_split)
+ntrain = nrow(train)
+ntest = nrow(test)
+```
+
+## ---- fit-data-logistic --------
+# fit the logistic models with tb as outcome 
+# second model has all variables as predictors
+```{r}
+log_mod <- logistic_reg() %>% set_engine("glm")
+logmod2 <- log_mod %>% fit(tb ~ ., data = train)
+
+```
+
+
+```{r}
+# Compute the accuracy and AUC for model 2
+logmod2_acc <- logmod2 %>% 
+  predict(train) %>% 
+  bind_cols(train) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+```
+
+```{r}
+levels(train$tb)
+```
+
+
+```{r}
+
+# Predict probabilities
+logmod2_probs <- logmod2 %>%
+  predict(new_data = train, type = "prob")  
+```
+
+
+```{r}
+logmod2_auc <-  logmod2 %>%
+  predict(new_data = train, type = "prob") %>%
+  bind_cols(train) %>%
+  roc_auc(truth = tb, .pred_YES)
+```
+
+
+```{r}
+# Print the results
+print(logmod2_acc)
+print(logmod2_auc)
+```
+
+```{r}
+# Bind predicted probabilities to the training data
+logmod2_with_probs <- bind_cols(train, logmod2_probs)
+
+#Save training data and predicted values as RDS
+save_data_location <- here::here("data","processed-data","logmod2_with_probs.rds")
+saveRDS(logmod2_with_probs, file = save_data_location)
+```
+
+
+```{r}
+ #Calculate ROC curve
+roc_curve_data <- yardstick::roc_curve(data = logmod2_with_probs, truth = tb, 
+                                       .pred_YES)
+#save the ROC curve as RDS
+
+
+# Print ROC curve data
+print(roc_curve_data)
+```
+```{r}
+# Plot ROC curve
+Roccurve <- ggplot(roc_curve_data, aes(x = sensitivity , y = 1 - specificity)) +
+  geom_line() +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  labs(x = "False Positive Rate (TB CASES)", 
+       y = "True Positive Rate (TB CASES)", 
+       title = "ROC Curve") +
+  theme_minimal()
+Roccurve
+
+figure_file = here("results","figures", "Roccurve.png")
+ggsave(filename = figure_file, plot=Roccurve) 
+```
+
+#Model improvement
+
+```{r}
+#Set a seed
+rngseed = 5002
+set.seed(rngseed)
+
+#Define cross-validation with k = 10 folds
+folds <- vfold_cv(train, v = 10)
+
+#setting model specification 
+model_specf <- logistic_reg() %>% set_engine("glm")
+
+
+# Workflow for all predictors
+wfall4 <- workflow() %>%
+  add_model(model_specf)%>%
+  add_formula(tb ~ .,)
+
+#Fitting the models with resampling 
+fit2 <- fit_resamples(wfall4, resamples = folds)
+
+#Getting metrics for both models 
+collect_metrics(fit2)
+```
+
+
+
+
+
+
+
+
+`
+
+
+
+

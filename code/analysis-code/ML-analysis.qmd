@@ -10,20 +10,15 @@ output: html_document
 This script uses tuberculosis(tb) as the outcome of interest and fits the following models to the analysis data:
 
 * Null
-* Decision Tree
-* Random Forest
 * LASSO
+* Random Forest
+* Support Vector Machine
 
 It compares the  models, and then finally fits the “best” model to the test data.
 
 <br>
 
-Follow the previous processing and analysis markdowns to generate the analysis data used here.
-
-<br>
-
 Each model will follow this process:
-
 1. Model Specification
 2. Workflow Definition
 3. Tuning Grid Specification
@@ -44,6 +39,9 @@ library(glmnet) #for lasso models
 library(doParallel) #for parallel backend for tuning processes
 library(ranger) #for random forest models
 library(yardstick)
+library(probably) #install.packages('probably')
+tidymodels_prefer()
+library(kernlab) 
 options(warn = defaultW)
 
 ```
@@ -52,19 +50,45 @@ options(warn = defaultW)
 
 ```{r}
 #Path to data. Note the use of the here() package and not absolute paths
-data_location <- here::here("data","processed-data","madaproject.rds")
+data_location <- here::here("data","processed-data","data2.rds")
 #load data
 # Loading the needed dataset
 madaproject <- readRDS(data_location)
+head(madaproject)
 colnames(madaproject)
 ```
 
 Before I start doing some model building I split the data into training and testing datasets.
 
+
+```{r}
+# evaluate class imbalance 
+madaproject %>% count(tb)
+```
+I see that i have more people without tb 
+
+Let me look at the levels 
+```{r}
+levels(madaproject$tb)
+```
+I see that NO is predicted first but I want yes 
+
+```{r}
+# If "YES" is not already the first level, use relevel() to interchange the levels
+madaproject$tb <- relevel(madaproject$tb, ref = "YES")
+
+# Check the levels again to confirm the change
+levels(madaproject$tb)
+```
+Now I see that YES is the first level
+
+Now I will split the data into training and testing 
 ```{r}
 #Set a seed
 rngseed = 5002
 set.seed(rngseed)
+
+# Data splits , train, test
 data_split <- initial_split(madaproject, prop = 0.7)
 train <- training(data_split)
 test <- testing(data_split)
@@ -72,111 +96,464 @@ ntrain = nrow(train)
 ntest = nrow(test)
 ```
 
-## ---- fit-data-logistic --------
-# fit the logistic models with tb as outcome 
-# second model has all variables as predictors
+
+FITTING OF ALL MODELS 
+Fitting the null model
 ```{r}
-log_mod <- logistic_reg() %>% set_engine("glm")
-logmod2 <- log_mod %>% fit(tb ~ ., data = train)
+#Fit a null model to the outcome tb
+logistic_model <- logistic_reg() %>% set_engine("glm")
+null_model <- logistic_model %>% fit(tb ~ 1, data = train)
+
+#Compute acurrancy  for the null model
+metrics_null <- null_model %>% 
+  predict(train) %>% 
+  bind_cols(train) %>% 
+  metrics(truth = tb, .pred_class)
+#Print accurancy for the null model
+print(metrics_null)
+
+```
+LASSO MODEL TUNING
+
+```{r}
+set.seed(rngseed)
+# Make sure you set reference level (the outcome you are NOT interested in)
+levels(madaproject$tb)
+
+data_cv10 <- vfold_cv(train, v = 10)
+
+# Logistic LASSO Regression Model Spec
+logistic_lasso_spec_tune <- logistic_reg() %>%
+    set_engine('glmnet') %>%
+    set_args(mixture = 1, penalty = tune()) %>%
+    set_mode('classification')
+    
+# Recipe
+logistic_rec <- recipe(tb ~ ., data = train) %>%
+    step_normalize(all_numeric_predictors()) %>% 
+    step_dummy(all_nominal_predictors())
+
+# Workflow (Recipe + Model)
+log_lasso_wf <- workflow() %>% 
+    add_recipe(logistic_rec) %>%
+    add_model(logistic_lasso_spec_tune)     
+
+# Tune Model (trying a variety of values of Lambda penalty)
+lasso_grid <- grid_regular(
+  penalty(range = c(-3, 1)), 
+  levels = 30)
+
+tune_outputlasso <- tune_grid( 
+  log_lasso_wf, # workflow
+  resamples = data_cv10, # cv folds
+  metrics = metric_set(roc_auc,accuracy),
+  control = control_resamples(save_pred = TRUE),
+  grid = lasso_grid # lasso penalty grid defined above
+)
+
+# Visualize Model Evaluation Metrics from Tuning
+autoplot(tune_outputlasso) + theme_classic()
+
+# Select Penalty
+best_se_penalty <- select_by_one_std_err(tune_outputlasso, metric = 'roc_auc', desc(penalty)) # choose penalty value based on the largest penalty within 1 se of the lowest CV roc_auc
+best_se_penalty
+
+# Fit Final Model
+final_fit_lasso <- finalize_workflow(log_lasso_wf, best_se_penalty) %>% # incorporates penalty value to workflow 
+fit(data = train)
 
 ```
 
+```{r}
+set.seed(rngseed)
+# Predict probabilities
+lassomodel_probs <- final_fit_lasso %>%
+  predict(new_data = train, type = "prob")  
+lassomodel_with_probs <- bind_cols(train, lassomodel_probs)
+
+
+#Calculate ROC curve
+roc_curve_lasso <- roc_curve(data = lassomodel_with_probs, truth = tb, .pred_YES)
+
+Lasso_ROCCURVE <- autoplot(roc_curve_lasso)
+Lasso_ROCCURVE
+# Save the table as a file
+figure_file = here("results","figures", "Lasso_ROCCURVE.png")
+ggsave(filename = figure_file, plot=Lasso_ROCCURVE) 
+```
 
 ```{r}
-# Compute the accuracy and AUC for model 2
-logmod2_acc <- logmod2 %>% 
+set.seed(rngseed)
+# Compute confusion matrix
+predictions <- predict(final_fit_lasso, new_data = train)
+pred_train <- bind_cols(train, predictions)
+conf_matlasso <- pred_train %>%
+  conf_mat(truth = tb, estimate = .pred_class)
+
+# Convert confusion matrix to data frame
+lassoconf_table<- as.data.frame(conf_matlasso$table)
+
+# Create a flextable from the data frame
+#lassoconf_table <- flextable(conf_dflasso)
+
+# Print the table
+print(lassoconf_table)
+
+# Save the table as a file
+summarytable_file <- here("results","tables", "lassoconf_table.rds")
+saveRDS(lassoconf_table, file = summarytable_file)
+```
+
+Now I will do Random Forest
+```{r}
+# Random Forest Model Spec
+rf_spec_tune <- rand_forest() %>%
+    set_mode("classification") %>%
+    set_engine("ranger") # or any other suitable engine
+
+# Recipe
+rf_rec <- recipe(tb ~ ., data = train)
+    
+# Workflow (Recipe + Model)
+rf_wf <- workflow() %>% 
+    add_recipe(rf_rec) %>%
+    add_model(rf_spec_tune)     
+
+# Tune Model (trying a variety of values of mtry and trees)
+rf_grid <- grid_regular(
+  mtry(range = c(1,7)), # adjusting based on number of predictors
+  trees(range = c(1, 21)), # adjust the range as needed
+  levels = 5 # adjust the number of levels as needed
+)
+
+
+tune_outputrf <- tune_grid( 
+  rf_wf, # workflow
+  resamples = data_cv10, # cv folds
+  metrics = metric_set(roc_auc),
+  control = control_resamples(save_pred = TRUE),
+  grid = rf_grid, # parameter grid defined above
+)
+print(tune_outputrf)
+# Visualize Model Evaluation Metrics from Tuning
+#autoplot(tune_outputrf)
+
+# Fit Final Model
+final_fit_rf <- finalize_workflow(rf_wf, select_best(tune_outputrf, "roc_auc")) %>% 
+    fit(data = train)
+
+
+```
+
+```{r}
+
+set.seed(rngseed)
+# Predict probabilities
+rfmodel_probs <- final_fit_rf %>%
+  predict(new_data = train, type = "prob")  
+rfmodel_with_probs <- bind_cols(train, rfmodel_probs)
+
+
+#Calculate ROC curve
+roc_curve_rf <- roc_curve(data = rfmodel_with_probs, truth = tb, .pred_YES)
+
+rf_ROCCURVE <- autoplot(roc_curve_rf)
+rf_ROCCURVE
+# Save the table as a file
+figure_file = here("results","figures", "rf_ROCCURVE.png")
+ggsave(filename = figure_file, plot=rf_ROCCURVE) 
+```
+
+```{r}
+set.seed(rngseed)
+# Compute confusion matrix
+predictions <- predict(final_fit_rf, new_data = train)
+pred_train <- bind_cols(train, predictions)
+conf_matrf <- pred_train %>%
+  conf_mat(truth = tb, estimate = .pred_class)
+
+# Convert confusion matrix to data frame
+rfconf_table <- as.data.frame(conf_matrf$table)
+
+# Create a flextable from the data frame
+#rfconf_table <- flextable(conf_dfrf)
+
+# Print the table
+print(rfconf_table)
+
+# Save the table as a file
+summarytable_file <- here("results","tables", "rfconf_table.rds")
+saveRDS(rfconf_table, file = summarytable_file)
+```
+
+Using Support Vector Machine 
+```{r}
+# Support Vector Machine Model Spec
+svm_spec_tune <- svm_poly() %>%
+    set_mode("classification") %>%
+    set_engine("kernlab") # or any other suitable engine for SVM
+
+# Recipe
+svm_rec <- recipe(tb ~ ., data = train)
+    
+# Workflow (Recipe + Model)
+svm_wf <- workflow() %>% 
+    add_recipe(svm_rec) %>%
+    add_model(svm_spec_tune)     
+
+# Tune Model (trying a variety of values of C and degree for polynomial kernel)
+svm_grid <- grid_regular(
+  cost(range = c(0.1, 10)), # adjust the range as needed
+  degree(range = c(1, 5)), # adjust the range as needed
+  levels = 5 # adjust the number of levels as needed
+)
+
+tune_outputsvm <- tune_grid( 
+  svm_wf, # workflow
+  resamples = data_cv10, # cv folds
+  metrics = metric_set(roc_auc),
+  control = control_resamples(save_pred = TRUE),
+  grid = svm_grid # parameter grid defined above
+)
+
+# Fit Final Model
+svmfinal_fit <- finalize_workflow(svm_wf, select_best(tune_outputsvm , "roc_auc")) %>% 
+    fit(data = train)
+
+
+```
+
+```{r}
+set.seed(rngseed)
+# Predict probabilities
+svmmodel_probs <- svmfinal_fit %>%
+  predict(new_data = train, type = "prob")  
+svmmodel_with_probs <- bind_cols(train, svmmodel_probs)
+
+
+#Calculate ROC curve
+roc_curve_svm <- roc_curve(data = rfmodel_with_probs, truth = tb, .pred_YES)
+
+svm_ROCCURVE <- autoplot(roc_curve_svm )
+svm_ROCCURVE
+# Save the table as a file
+figure_file = here("results","figures", "svm_ROCCURVE.png")
+ggsave(filename = figure_file, plot=svm_ROCCURVE) 
+```
+
+```{r}
+set.seed(rngseed)
+# Compute confusion matrix
+predictions <- predict(svmfinal_fit, new_data = train)
+pred_train <- bind_cols(train, predictions)
+conf_matsvm <- pred_train %>%
+  conf_mat(truth = tb, estimate = .pred_class)
+
+# Convert confusion matrix to data frame
+svmconf_table <- as.data.frame(conf_matsvm$table)
+
+# Create a flextable from the data frame
+#svmconf_table <- flextable(conf_dfsvm)
+
+# Print the table
+print(svmconf_table)
+
+# Save the table as a file
+summarytable_file <- here("results","tables", "svmconf_table.rds")
+saveRDS(svmconf_table, file = summarytable_file)
+
+
+ 
+```
+Organising results of accuracy and RMSE
+
+```{r}
+# Null model
+# Compute the accuracy and AUC for null model
+null_acc <- null_model %>% 
   predict(train) %>% 
   bind_cols(train) %>% 
   metrics(truth = tb, estimate = .pred_class) %>% 
   filter(.metric %in% c("accuracy"))
+
+null_auc <-  null_model %>%
+  predict(train, type = "prob") %>%
+  bind_cols(train) %>%
+  roc_auc(truth = tb, .pred_YES)
 ```
 
 ```{r}
-levels(train$tb)
+#LASSO model
+# Compute the accuracy and AUC for Lasso
+lasso_acc <- final_fit_lasso %>% 
+  predict(train) %>% 
+  bind_cols(train) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+
+lasso_auc <-  final_fit_lasso %>%
+  predict(train, type = "prob") %>%
+  bind_cols(train) %>%
+  roc_auc(truth = tb, .pred_YES)
 ```
 
-
 ```{r}
+#Random model
+# Compute the accuracy and AUC for model 2
+rf_acc <- final_fit_rf %>% 
+  predict(train) %>% 
+  bind_cols(train) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
 
-# Predict probabilities
-logmod2_probs <- logmod2 %>%
-  predict(new_data = train, type = "prob")  
-```
-
-
-```{r}
-logmod2_auc <-  logmod2 %>%
-  predict(new_data = train, type = "prob") %>%
+rf_auc <-  final_fit_rf %>%
+  predict(train, type = "prob") %>%
   bind_cols(train) %>%
   roc_auc(truth = tb, .pred_YES)
 ```
 
 
 ```{r}
+#Support Vector Machine
+# Compute the accuracy and AUC for SVM
+svm_acc <- svmfinal_fit %>% 
+  predict(train) %>% 
+  bind_cols(train) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+
+svm_auc <-  svmfinal_fit %>%
+  predict(train, type = "prob") %>%
+  bind_cols(train) %>%
+  roc_auc(truth = tb, .pred_YES)
+
+```
+
+```{r}
 # Print the results
-print(logmod2_acc)
-print(logmod2_auc)
+print(null_acc)
+print(lasso_acc)
+print(rf_acc)
+print(svm_acc)
+print(null_auc)
+print(lasso_auc)
+print(rf_auc)
+print(svm_auc)
+```
+```{r}
+# Create a data frame with model names, accuracy, and AUC
+model_perfomance_train <- data.frame(
+  Model = c("Null Model", "Lasso Model", "Random Forest Model", "Support Vector model"),  # Replace with your model names
+  Accuracy = c(0.5781931	, 0.7831776	, 0.8255452	, 0.7838006	),  # Replace with your accuracy values
+  AUC = c(0.5	, 0.8707883	, 0.8973205		, 0.8618063		)  # Replace with your AUC values
+)
+
+# Print the results
+print(model_perfomance_train)
+
+# Save the table as a file
+
+summarytable_file <- here("results","tables", "model_perfomance_train.rds")
+saveRDS(model_perfomance_train, file = summarytable_file)
+
+```
+
+MODEL EVALUTIONS
+I will fit the models again using test data and look at the results 
+
+
+
+```{r}
+
+# Null model
+# Compute the accuracy and AUC for null model
+null_acc <- null_model %>% 
+  predict(test) %>% 
+  bind_cols(test) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+
+null_auc <-  null_model %>%
+  predict(test, type = "prob") %>%
+  bind_cols(test) %>%
+  roc_auc(truth = tb, .pred_YES)
 ```
 
 ```{r}
-# Bind predicted probabilities to the training data
-logmod2_with_probs <- bind_cols(train, logmod2_probs)
+#LASSO model
+# Compute the accuracy and AUC for model 2
+lasso_acc <- final_fit_lasso %>% 
+  predict(test) %>% 
+  bind_cols(test) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
 
-#Save training data and predicted values as RDS
-save_data_location <- here::here("data","processed-data","logmod2_with_probs.rds")
-saveRDS(logmod2_with_probs, file = save_data_location)
+lasso_auc <-  final_fit_lasso %>%
+  predict(test, type = "prob") %>%
+  bind_cols(test) %>%
+  roc_auc(truth = tb, .pred_YES)
+```
+
+```{r}
+#Random model
+# Compute the accuracy and AUC for model 2
+rf_acc <- final_fit_rf %>% 
+  predict(test) %>% 
+  bind_cols(test) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+
+rf_auc <-  final_fit_rf %>%
+  predict(test, type = "prob") %>%
+  bind_cols(test) %>%
+  roc_auc(truth = tb, .pred_YES)
 ```
 
 
 ```{r}
- #Calculate ROC curve
-roc_curve_data <- yardstick::roc_curve(data = logmod2_with_probs, truth = tb, 
-                                       .pred_YES)
-#save the ROC curve as RDS
+#Random model
+# Compute the accuracy and AUC for model 2
+svm_acc <- svmfinal_fit %>% 
+  predict(test) %>% 
+  bind_cols(test) %>% 
+  metrics(truth = tb, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
 
+svm_auc <-  svmfinal_fit %>%
+  predict(test, type = "prob") %>%
+  bind_cols(test) %>%
+  roc_auc(truth = tb, .pred_YES)
 
-# Print ROC curve data
-print(roc_curve_data)
 ```
-```{r}
-# Plot ROC curve
-Roccurve <- ggplot(roc_curve_data, aes(x = sensitivity , y = 1 - specificity)) +
-  geom_line() +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "False Positive Rate (TB CASES)", 
-       y = "True Positive Rate (TB CASES)", 
-       title = "ROC Curve") +
-  theme_minimal()
-Roccurve
-
-figure_file = here("results","figures", "Roccurve.png")
-ggsave(filename = figure_file, plot=Roccurve) 
-```
-
-#Model improvement
 
 ```{r}
-#Set a seed
-rngseed = 5002
-set.seed(rngseed)
+# Print the results
+print(null_acc)
+print(lasso_acc)
+print(rf_acc)
+print(svm_acc)
+print(null_auc)
+print(lasso_auc)
+print(rf_auc)
+print(svm_auc)
+```
 
-#Define cross-validation with k = 10 folds
-folds <- vfold_cv(train, v = 10)
+```{r}
+# Create a data frame with model names, accuracy, and AUC Based on test data
+model_perfomance_test <- data.frame(
+  Model = c("Null Model", "Lasso Model", "Random Forest Model", "Support Vector model"),  # Replace with your model names
+  Accuracy = c(0.6023222	, 0.8026125	, 0.8156749		, 0.796807),  # Replace with your accuracy values
+  AUC = c(0.5	, 0.8894864		, 0.8868349			, 0.882473			)  # Replace with your AUC values
+)
 
-#setting model specification 
-model_specf <- logistic_reg() %>% set_engine("glm")
+# Print the results
+print(model_perfomance_test)
 
+# Save the table as a file
 
-# Workflow for all predictors
-wfall4 <- workflow() %>%
-  add_model(model_specf)%>%
-  add_formula(tb ~ .,)
+summarytable_file = here("results","tables", "model_perfomance_test.rds")
+saveRDS(model_perfomance_test, file = summarytable_file)
 
-#Fitting the models with resampling 
-fit2 <- fit_resamples(wfall4, resamples = folds)
-
-#Getting metrics for both models 
-collect_metrics(fit2)
 ```
 
 
@@ -186,7 +563,9 @@ collect_metrics(fit2)
 
 
 
-`
+
+
+
 
 
 
