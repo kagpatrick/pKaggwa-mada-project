@@ -161,7 +161,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::lag()      masks stats::lag()
 ✖ yardstick::spec() masks readr::spec()
 ✖ recipes::step()   masks stats::step()
-• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr) <span class="co">#for variable summaries</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed) <span class="co">#for converting bayesian models to tidy tibbles</span></span>
@@ -900,6 +900,7 @@ using the resamples with no tuning. Did you want to [tune()] parameters?</code><
 <span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>summarytable_file <span class="ot">=</span> <span class="fu">here</span>(<span class="st">"results"</span>,<span class="st">"tables"</span>, <span class="st">"model_perfomance_test.rds"</span>)</span>
 <span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(model_perfomance_test, <span class="at">file =</span> summarytable_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>The evaluation of machine learning models’ performance on test data is pivotal for gauging their efficacy and generalization capabilities. In this study, conducted to assess predictive accuracy, the models were measured using metrics such as accuracy and Area Under the Curve (AUC). The Lasso, Random Forest, and Support Vector models were compared against a Null Model, with their respective performance metrics outlined. The results revealed a notable performance gap between the advanced models and the Null Model. Specifically, the Random Forest model exhibited superior performance, achieving an accuracy of 81.57% and an AUC of 0.887. In contrast, the Lasso and Support Vector models attained accuracies of 80.26% and 79.68%, with corresponding AUC values of 0.889 and 0.882, respectively.</p>
 </section>
 
 </main>

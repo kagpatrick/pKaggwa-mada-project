@@ -133,19 +133,21 @@ variables <- c("Gender", "Asthma", "Smoke", "Alcohol", "feverstatus",
                "homefuel", "hivstatus")
 
 # Create a summary table with specified variable types
-summary_table_characteristics <- madaproject %>%
+characteristics <- madaproject %>%
   select(all_of(variables), tb) %>%
   tbl_summary(
     by = tb,
     type = everything() ~ "categorical"
   )
-
+characteristics <- data.frame(characteristics)
 # Print the summary table
-summary_table_characteristics 
+characteristics 
  
 # Save table
-saveRDS(table1, file = here::here("results", "tables", "summary_table_characteristics .rds"))
 
+
+summarytable_file <- here("results", "tables", "characteristics.rds")
+saveRDS(characteristics, file = summarytable_file)
 
 ```
 

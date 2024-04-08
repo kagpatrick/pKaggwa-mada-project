@@ -556,7 +556,7 @@ saveRDS(model_perfomance_test, file = summarytable_file)
 
 ```
 
-
+The evaluation of machine learning models' performance on test data is pivotal for gauging their efficacy and generalization capabilities. In this study, conducted to assess predictive accuracy, the models were measured using metrics such as accuracy and Area Under the Curve (AUC). The Lasso, Random Forest, and Support Vector models were compared against a Null Model, with their respective performance metrics outlined. The results revealed a notable performance gap between the advanced models and the Null Model. Specifically, the Random Forest model exhibited superior performance, achieving an accuracy of 81.57% and an AUC of 0.887. In contrast, the Lasso and Support Vector models attained accuracies of 80.26% and 79.68%, with corresponding AUC values of 0.889 and 0.882, respectively.
 
 
 
