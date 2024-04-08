@@ -36,7 +36,7 @@ Evaluation of four machine learning models—LASSO, Random Forest, Support Vecto
 
 ## Consclusion
 
-These results highlight the potential of advanced machine learning algorithms, particularly Random Forest, in enhancing TB diagnosis and early detection strategies, offering valuable insights for clinical decision-making and the development of more effective screening protocols.
+The results highlight the potential of advanced machine learning algorithms, particularly Random Forest, in enhancing TB diagnosis and early detection strategies, offering valuable insights for clinical decision-making and the development of more effective screening protocols.
 {{< pagebreak >}}
 
 # Introduction
