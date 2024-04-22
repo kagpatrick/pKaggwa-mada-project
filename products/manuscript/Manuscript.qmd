@@ -8,7 +8,7 @@ format:
     toc: false
     number-sections: true
     highlight-style: github
-bibliography: ../../assets/mada.bib
+bibliography: ../../assets/MADAPROJECT.bib
 csl: ../../assets/apa.csl
 ---
 
@@ -41,15 +41,13 @@ The results highlight the potential of advanced machine learning algorithms, par
 
 # Introduction
 
-Tuberculosis (TB) remains a significant global health challenge due to diagnostic limitations affecting both pediatric and adult populations, resulting in delayed diagnosis or misdiagnosis[@Xin2019]. This delay impacts individual prognosis and community transmission[@]. TB, caused by the bacterium Mycobacterium tuberculosis, primarily affects the lungs but can also involve other organs in its active form or remain latent without symptoms[@Bulled2020],. In 2020, TB ranked among the top 10 causes of death globally, with over 10 million new cases and 1.3 million deaths reported.
-
-Africa bears a considerable burden, with an estimated quarter of new cases globally, resulting in approximately 417,000 deaths annually[@WHO2023]. TB is a leading cause of death among HIV-infected patients in sub-Saharan Africa, compounded by the low sensitivity of the commonly used sputum smear microscopy, particularly in detecting TB among people living with HIV.
+Tuberculosis (TB) remains a significant global health challenge due to diagnostic limitations affecting both pediatric and adult populations, resulting in delayed diagnosis or misdiagnosis[@sagili_strategies_2022]. This delay impacts individual prognosis and community transmission[@]. TB, caused by the bacterium Mycobacterium tuberculosis, primarily affects the lungs but can also involve other organs in its active form or remain latent without symptoms[@baykan_extrapulmonary_2022],. In 2020, TB ranked among the top 10 causes of death globally, with over 10 million new cases and 1.3 million deaths reported.
+Africa bears a considerable burden, with an estimated quarter of new cases globally, resulting in approximately 417,000 deaths annually[@chakaya_who_2022]. TB is a leading cause of death among HIV-infected patients in sub-Saharan Africa, compounded by the low sensitivity of the commonly used sputum smear microscopy, particularly in detecting TB among people living with HIV[@palattiyil_access_2022].
 
 ## General Background Information
 
-In Uganda, TB remains a significant public health concern, with an incidence of 330 cases per 100,000 people annually, including 136 new smear-positive cases per 100,000. Diagnostic delays persist due to health services often waiting for systematic symptoms before examining sputum smears, leading to missed opportunities for timely diagnosis.
-
-The GeneXpert diagnostic tool offers superior sensitivity compared to sputum smear microscopy but is underutilized in Uganda due to its expense, resulting in over 41,000 undiagnosed cases annually. Even with existing diagnostic methods like blood tests or sputum tests, analysis times are prolonged, allowing culture-positive TB cases to go undetected.
+In Uganda, TB remains a significant public health concern, with an incidence of 330 cases per 100,000 people annually, including 136 new smear-positive cases per 100,000[@kintu_unfavorable_2023]. Diagnostic delays persist due to health services often waiting for systematic symptoms before examining sputum smears, leading to missed opportunities for timely diagnosis.
+The GeneXpert diagnostic tool offers superior sensitivity compared to sputum smear microscopy but is underutilized in Uganda due to its expense[@brown_implementation_2021], resulting in over 41,000 undiagnosed cases annually. Even with existing diagnostic methods like blood tests or sputum tests, analysis times are prolonged, allowing culture-positive TB cases to go undetected[@dong_improved_2022].
 
 ## Description of data and data source
 
