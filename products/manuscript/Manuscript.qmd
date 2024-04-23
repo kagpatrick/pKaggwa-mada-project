@@ -91,10 +91,8 @@ Our analysis began with thorough data preparation. Following a systematic approa
 
 Data analysis was conducted using R Studio version RStudio 2023.09.1. Descriptive statistics (frequencies, mean, standard deviation (SD), median, interquartile range (IQR), and proportions) were used to present the baseline characteristics of participants. we used histograms, bar graphs, and box plots, to show how data was distributed.We did cross tabulation between the covariates and the outcome.A dataset of 2294 patients was analyzed. Amongst these patients, the gender distribution was 47.0% female and 53.0% male with mean age of 31 years.
 
-```{r }
-#| label: tbl-characteristics
-#| tbl-cap: " Participants' Characteristics"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE }
+
 ch<- readRDS(here("results", "tables", "characteristics.rds"))
 
 ch %>%
@@ -105,10 +103,8 @@ ch %>%
 
 In our study, we utilized 2296 instances and examined 14 variables associated with TB. Subsequently, nine variables were selected for prediction after conducting chi-square tests. Non-statistically significant variables associated with TB were eliminated. Following this, chi-square tests were applied to the nine chosen variables to assess their association with a threshold of 0.05. However, these tests did not reveal a significant association among the variables themselves. Therefore, they were included in the prediction model. The variables retained for prediction were: asthma, alcohol use, fever, chest radiography, home fuel use, weight loss, presence of blood in sputum, oxygen saturation, and HIV status.
 
-```{r }
-#| label: tbl-model_perfomance_train
-#| tbl-cap: "Model_perfomance."
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE}
+
 mpf <- readRDS(here("results", "tables", "model_perfomance_train.rds"))
 
 mpf %>%
@@ -117,29 +113,20 @@ mpf %>%
 
 This study examines the efficacy of four distinct machine learning models in predicting the presence of tuberculosis (TB) using input data. Each model, including LASSO, Random Forest, Support Vector Machine (SVM), and a Null model, is rigorously evaluated based on key performance metrics. The LASSO model applies the Least Absolute Shrinkage and Selection Operator regularization technique, while the Random Forest model employs ensemble learning. SVM seeks to optimize hyperplanes for class separation, and the Null model serves as a simplistic baseline. Performance assessment encompasses accuracy (with LASSO achieving 80.26%, Random Forest achieving 81.57%, SVM achieving 79.68%, and the Null model achieving 60.23%), Area Under the Curve (AUC) (with LASSO achieving 0.8895, Random Forest achieving 0.8868, SVM achieving 0.8825, and the Null model achieving 0.5). The findings underscore the potential of advanced machine learning algorithms, particularly Random Forest and LASSO, in enhancing TB diagnosis and early detection strategies.
 
-```{r }
-#| label: tbl-Random Forest
-#| tbl-cap: " Model Predictions (Random Forest)"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE }
 rf <- readRDS(here("results", "tables", "rfconf_table.rds"))
-
 rf %>%
   kable()
 ```
 
 The table presents the classification results of a Random Forest model for predicting tuberculosis (TB) status in individuals. Among individuals with TB (TB=YES), the model correctly identified 619 true positives and incorrectly predicted 219 cases as TB false negatives. For individuals without TB, the model accurately classified 709 cases as TB true negatives but misclassified 58 cases as TB false positives.
 
-```{r }
-#| label: fig-Random Forest_Roccurve
-#| fig-cap: "Random Forest_Roccurve"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE }
 knitr::include_graphics(here("results","figures", "rf_ROCCURVE.png"))
 ```
 
-```{r }
-#| label: tbl-Support Vector Machine
-#| tbl-cap: "  Model Predictions (SVM)"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE}
+
 svm<- readRDS(here("results", "tables", "svmconf_table.rds"))
 svm %>%
   kable()
@@ -147,17 +134,13 @@ svm %>%
 
 The table presents the classification results of a Support Vector Machine model for predicting tuberculosis (TB) status in individuals. Among individuals with TB, the model correctly identified 621 true positives and incorrectly predicted 291 cases as TB false negatives. For individuals without TB, the model accurately classified 637 cases as TB true negatives but misclassified 56 cases as TB positive (false positives).
 
-```{r }
-#| label: fig-supporter Vector Machine_Roccurve
-#| fig-cap: "svm_ROCCURVE"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE}
+
 knitr::include_graphics(here("results","figures", "svm_ROCCURVE.png"))
 ```
 
-```{r }
-#| label: tbl-LASSO
-#| tbl-cap: "  Model Predictions (LASSO)"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE}
+
 ls<- readRDS(here("results", "tables", "lassoconf_table.rds"))
 ls %>%
   kable()
@@ -165,17 +148,13 @@ ls %>%
 
 The table presents the classification results of a LASSSO model for predicting tuberculosis (TB) status in individuals. Among individuals with TB, the model correctly identified 654 true positives and incorrectly predicted 291 cases as TB false negatives. For individuals without TB, the model accurately classified 603 cases as TB true negatives but misclassified 23 cases as TB false positives.
 
-```{r }
-#| label: fig-Lasso_ROCCURVE
-#| fig-cap: "Lasso_ROCCURVE"
-#| echo: FALSE 
+```{r echo=FALSE, message = FALSE}
+ 
 knitr::include_graphics(here("results","figures", "Lasso_ROCCURVE.png"))
 ```
 
-```{r}
-#| label: model_perfomance_test
-#| tbl-cap: "model_perfomance_test"
-#| echo: FALSE
+```{r echo=FALSE, message = FALSE}
+
 tmpf <- readRDS(here("results", "tables", "model_perfomance_test.rds"))
 
 tmpf %>%
