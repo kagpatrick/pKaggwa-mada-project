@@ -25,7 +25,7 @@ library(htmltools)
 
 ## Introduction
 
-Although early detection and treatment of Tuberculosis cases are the hallmark of successful TB control, diagnostic delay is still long and common in Uganda. Therefore, the study aimed atdeveloping a tool that uses machine-learning techniques to detect and diagnose TB more accurately in a shorter time.
+Although early detection and treatment of Tuberculosis cases are the hallmark of successful TB control, diagnostic delay is still long and common in Uganda. Therefore, the study aimed at developing a tool that uses machine-learning techniques to detect and diagnose TB more accurately in a shorter time.
 
 ## Methods
 

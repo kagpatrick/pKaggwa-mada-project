@@ -1,0 +1,173 @@
+---
+title: Project Review Template 
+author: Emma Hardin-Parker
+date: date-modified
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+Title of project: CASE DETECTION OF TUBERCULOSIS PATIENTS USING MACHINE-LEARNING
+
+Name of project author(s): Patrick Kaggwa
+
+Name of project reviewer: Emma Hardin-Parker
+
+
+# Instructions
+
+
+# Specific project content evaluation
+
+
+## Background, Context and Motivation
+
+### Feedback and Comments
+
+Hey Patrick, I would suggest revising your Introduction section of the Abstract. It is a little tough to understand on a first read. You provided a great deal of insight into the background and described the data and data collection well. Past research was not mentioned; however, you provided enough references and mentioned tools already used in Uganda so I think it is okay! I would suggest adding some information on why you are "motivated" to do this project and what you hope to gain from it. 
+
+### Summary assessment 
+
+* strong contextualization and motivation
+
+
+## Question description
+
+
+### Feedback and Comments
+
+The questions and hypotheses are well defined. The questions relate well to the data and are very clear. 
+
+
+### Summary assessment
+
+* question/hypotheses fully clear
+
+
+## Data description
+
+### Feedback and Comments
+
+The data is described very well and the README.md file within the raw-data file contains a detailed codebook. I felt very comfortable understanding the data and how/why the data were collected. The source was also provided. 
+
+### Summary assessment
+
+* source and overall structure of data well explained
+
+
+## Data wrangling and exploratory analysis
+
+### Feedback and Comments
+
+The data is well cleaned and explored; however, there were not many explanations on the "why" behind your processing and exploratory analysis. Adding some information in the eda.qmd or processingfile-v1.qmd file may be helpful! The Supplementary-Material.qmd file is untouched and unedited. I recommend following some of Dr. Handel's guidance and the Project Examples on the website to ensure this file contains the right material! 
+
+
+### Summary assessment
+
+* some weaknesses in wrangling and exploratory component
+
+
+## Appropriateness of Analysis
+
+### Feedback and Comments
+
+I would recommend adding more information in the README.md file within the analysis-code folder. Since you have multiple Quarto files with different analyses, explanation on why they are separate or where to go to reproduce the results would be helpful. I would continue to add more explanations within these files to explain why you are conducting this analysis and what each step is telling you. The analyses were all appropriate for the data and the analyses were conducted properly. 
+
+
+### Summary assessment
+
+* defensible but not optimal analysis 
+
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+
+The results are presented well and are easy to read and understand. If you have time, I would suggest making some improvements to plots and tables so they print more professionally. Some features in plotly() and ggplot2() can really help make your figures and tables look nicer! It can be a pain but it really pays off. 
+
+
+### Summary assessment
+
+* results are presented ok, with room for improvement
+
+
+
+## Discussion/Conclusions
+
+### Feedback and Comments
+
+The findings are well reported in the Manuscript. Both strengths and limitations are acknowledged in depth and the findings are accurately reported. 
+
+### Summary assessment
+
+* strong, complete and clear discussion
+
+
+## Further comments
+
+Patrick, you've done great work. I would really recommend explaining your processes more within the individual analysis and processing files. I would also recommend really bolstering both your README.md and Supplementary-Material files. The Supplementary-Material file is crucial to be able to formally present results and processes that were not included with the manuscript itself. 
+
+
+
+# Overall project content evaluation
+
+
+## Structure
+
+
+### Feedback and Comments
+
+The project is well-structured, but some work needs to be done with the README.md files and Supplementary-Material file. Some folders are unusued/contain untouched README.md files so you may need to address those things. All files are named appropriately and all figures and tables are labeled perfectly. 
+
+### Summary assessment
+
+* mostly clear, but some confusing parts (e.g. useless files, things in the wrong folders)
+
+
+## Documentation 
+
+### Feedback and Comments
+
+The manuscript is documented very well, but some of that documentation is lost throughout the rest of the project. README.md files are crucial to having full understanding of how the analysis works and where everything is supposed to be. Additionally, I would recommend putting comments or introductions in your analysis files to ensure that any viewer knows exactly what is going on. 
+
+### Summary assessment
+
+* decently documented with some gaps
+
+
+
+
+## Reproducibility
+
+### Feedback and Comments
+
+All of your results were fully reproducible. There weren't a lot of files that clearly explained "how" to reproduce the results. I was able to just from our experience with this class and this sort of project, so you may need to bolster those explanations. I was able to run everything without manual interventions or edits. 
+
+### Summary assessment
+
+* fully reproducible without issues
+
+
+## Thoroughness
+
+### Feedback and Comments
+
+The project overall is very thorough. You really dove into a lot of ML models and techniques we learned over the semester! I really commend you for that. You did a great job discussing the data and the analyses themselves in the manuscript. Alternative methods were discussed in the limitations section and allow for further insight/questions into what kinds of studies/research could be conducted in the future. Overall, you did a great job! 
+
+### Summary assessment
+
+* strong level of thorougness
+
+
+## Further comments
+
+Your project is great! I added some comments/suggestions throughout this file. Please do not hesistate to reach out if you have any clarifying questions. I really enjoyed reading your manuscript and going through your analyses!
+
+
+
+
