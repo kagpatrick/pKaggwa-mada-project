@@ -1,0 +1,63 @@
+---
+title: "CASE DETECTION OF TUBERCULOSIS PATIENTS USING MACHINE-LEARNING"
+subtitle: ""
+author: Patrick Kaggwa
+date: "2024-02-24"
+format:
+  docx:
+    toc: false
+    number-sections: true
+    highlight-style: github
+bibliography: ../../assets/MADAPROJECT.bib
+csl: ../../assets/apa.csl
+---
+
+```{r, echo=FALSE, message=FALSE}
+# load a few R packages
+library(here)
+library(knitr)
+library(magrittr)
+library(flextable)
+library(htmltools)
+```
+
+## Supplemental Information
+This document represents additional information about the data and results.
+
+
+```{r echo=FALSE, message = FALSE}
+#| label: fig-schematic2
+#| fig-cap: "TB_barplot"
+#| echo: false
+knitr::include_graphics(here("results","figures", "tb_barplot.png"))
+```
+```{r echo=FALSE, message = FALSE}
+#| label: fig-schematic3
+#| fig-cap: "Age distribution"
+#| echo: false
+knitr::include_graphics(here("results","figures", "age_distribution.png"))
+```
+
+
+```{r echo=FALSE, message = FALSE}
+#| label: fig-schematic10
+#| fig-cap: "AGe _TB Box PLot"
+#| echo: false
+knitr::include_graphics(here("results","figures", "age_boxplot.png"))
+```
+
+```{r echo=FALSE, message = FALSE}
+#| label: fig-schematic4
+#| fig-cap: "Hivstatus barplot"
+#| echo: false
+knitr::include_graphics(here("results","figures", "hivstatus_barplot.png"))
+```
+
+
+```{r echo=FALSE, message = FALSE}
+#| label: tbl-schematic8
+#| tbl-cap: "Table showing Characteristics"
+ls<- readRDS(here("results", "tables", "characteristics.rds"))
+ls %>%
+  knitr::kable()
+```

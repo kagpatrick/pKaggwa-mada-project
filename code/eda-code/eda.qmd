@@ -139,9 +139,14 @@ characteristics <- madaproject %>%
     by = tb,
     type = everything() ~ "categorical"
   )
-characteristics <- data.frame(characteristics)
+
+# Convert tbl_summary object to data frame and assign column names
+characteristics <- as.data.frame(characteristics)
+column_names <- c("Characteristic", "No TB", "With TB")
+names(characteristics) <- column_names
+
 # Print the summary table
-characteristics 
+print(characteristics)
  
 # Save table
 
