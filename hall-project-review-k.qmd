@@ -1,0 +1,206 @@
+---
+title: Project Review 
+author: ELIZABETH HALL
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+Title of project: CASE DETECTION OF TUBERCULOSIS PATIENTS USING MACHINE-LEARNING
+
+Name of project author: Patrick Kaggwa
+
+Name of project reviewer: Elizabeth Hall
+
+------------------------------------------------------------------------
+
+# Specific project content evaluation
+
+------------------------------------------------------------------------
+
+## Background, Context and Motivation
+
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+The context of the project is well described, and provides a comprehensive background with summaries of previous/related work, with multiple citations listed. The project itself fits well into the context of the existing body of work. The motivation for the project is also clear, as the need for faster diagnosis times is mentioned in the background and the study looks at early clinical TB data. What new information the study hopes to provide is not explicitly stated, but can be inferred based on the background provided.
+
+### Summary assessment
+
+-   strong contextualization and motivation
+
+------------------------------------------------------------------------
+
+## Question description
+
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+### Feedback and Comments
+
+The questions/hypotheses are explicitly stated, and have a dedicated section in the manuscript. It is also clear how the questions relate to the data.
+
+### Summary assessment
+
+-   question/hypotheses fully clear
+
+------------------------------------------------------------------------
+
+## Data description
+
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is?
+
+### Feedback and Comments
+
+The source of the data is not given (that I could find), but the data collection is detailed in the manuscript. The data structure is somewhat explained in the `README.md` file in the `raw-data` folder, definitions are provided but specific variable names are not provided.
+
+I would suggest making a simple codebook to explain each variable, and link back to the data source. GitHub has various codebook templates to chose from/reference. I used [this](https://gist.github.com/fmaskari/5886dbcc5ab73f2ea663) template for my project.
+
+### Summary assessment
+
+-   source and overall structure of data somewhat explained
+
+------------------------------------------------------------------------
+
+## Data wrangling and exploratory analysis
+
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+
+WRITE YOUR FEEDBACK HERE
+
+The data is well cleaned and annotated. The data processing steps are neatly documented and explained in the `processingfile-v1.qmd` file which is in the `processing-code` folder. Alternatives for data wrangling/exploratory analysis are not explicitly discussed.
+
+Exploratory code is also well cleaned and annotated, with steps being documented in `eda.qmd` which is in the `eda-code` folder. Alternatives are not discussed. Meaningful results are shown which can be seen when running the code or found in the `figures` folder under `results`.
+
+I would recommend mentioning alternative exploratory/data wrangling methods, but otherwise this part looks good!
+
+### Summary assessment
+
+-   essentially no weaknesses in wrangling and exploratory component
+
+------------------------------------------------------------------------
+
+## Appropriateness of Analysis
+
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+The analysis methods used were appropriate for the data, and the analysis was done properly. Metrics like AUC and accuracy were used to evaluate model performance, which based on the brief searching I did, is appropriate for the data. The different components of the analysis are also done well, and explained thoroughly in the qmd files that accompany the code. 
+
+Your analysis section seems thorough and well done! 
+
+### Summary assessment
+
+-   strong and reasonable analysis
+
+------------------------------------------------------------------------
+
+## Presentation
+
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality?
+
+### Feedback and Comments
+
+The results are presented decently, but there is room for improvement. Tables/figures have informative descriptions but no titles or labels so they are not publication quality.
+
+I'd recommend changing variable names when graphing/generating tables so that they don't get cut off and are easier to read. I'd also recommend adding graph/table titles so that it's content can be easily contextualized. My last recommendation is to add figure/table labels (e.g. "Figure 1", "Table 1", etc.)
+
+### Summary assessment
+
+-   results are presented ok, with room for improvement
+
+
+------------------------------------------------------------------------
+
+## Discussion/Conclusions
+
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+
+The findings are are discussed properly, and explained well. This section could be fleshed out with references to other literature. Strengths and limitations are explicitly acknowledged and the findings are interpreted properly.
+
+### Summary assessment
+
+-   strong, complete and clear discussion
+
+------------------------------------------------------------------------
+
+## Further comments
+
+Your project looks good so far! My main suggestions are to do some work on your tables/figures, and to include more information about the data. 
+
+------------------------------------------------------------------------
+
+# Overall project content evaluation
+
+------------------------------------------------------------------------
+
+## Structure
+
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+The structure of the project is mostly clear but could be improved. Some readme's still contain text from the original template, and should be updated or removed. Other than cleaning up junk files, the structure is good! 
+
+### Summary assessment
+
+-   mostly clear, but some confusing parts (e.g. useless files, things in the wrong folders)
+
+------------------------------------------------------------------------
+
+## Documentation
+
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files?
+
+### Feedback and Comments
+
+The project is well documented with corresponding qmd files for most code. These qmd files are well annotated, and the explanations are easy to follow. The code itself also contains comments which provide less in-depth, but clear explanations of the code's function.
+
+### Summary assessment
+
+-   fully and well documented
+
+------------------------------------------------------------------------
+
+## Reproducibility
+
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+I was able to reproduce most results with little to no issue, however I encountered errors when running the `statistical-analysis.R` code, which is in the `analysis-code` folder. Machine learning models can be finicky, but this is a fixable issue.
+
+I also encountered minor issues with the `edacode.R` involving path issues when loading the data which I was able to fix via manual intervention. 
+
+### Summary assessment
+
+-   small parts not reproducible or required manual intervention
+
+------------------------------------------------------------------------
+
+## Thoroughness
+
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+
+Overall the study was decently thorough. The questions/hypotheses were fully addressed, though alternatives weren't really discussed. Discussion of alternative methods of data processing and different models could bolster the study in this area. 
+
+### Summary assessment
+
+-   decent level of thoroughness
+
+------------------------------------------------------------------------
+
+## Further comments
+
+Your project looks good so far! All issues I came across are easily fixable, and I especially liked your analysis section. My suggestions for this part are to make sure your code is reproducible and to mention some alternatives. Great job! :]

@@ -1,0 +1,119 @@
+---
+title: "Predicting of the pulmunary TB cases , Uganda"
+author: "Patrick Kaggwa"
+date: "12/03/2024"
+output: html_document
+---
+
+```{r}
+# load the relevant tidymodels libraries
+library(here) #for data loading/saving
+library(tidyverse) #for data management
+library(tidymodels) #for data modeling
+library(skimr) #for variable summaries
+library(broom.mixed) #for converting bayesian models to tidy tibbles
+library(glmnet) #for lasso models
+library(doParallel) #for parallel backend for tuning processes
+library(ranger) #for random forest models
+library(rsample)
+library(vcd)# Load the vcd package for Cramer's V calculation
+```
+
+The purpose of this is to check if some variable are dropped by the lasso model so to get an insight of what variables 
+
+## Load the data.
+
+```{r}
+#Path to data. Note the use of the here() package and not absolute paths
+data_location <- here::here("data","processed-data","madaproject.rds")
+#load data
+# Loading the needed dataset
+madaproject <- readRDS(data_location)
+
+```
+
+Before I start doing some model building I split the data into training and testing datasets.
+
+```{r}
+colnames(madaproject)
+```
+
+       
+
+
+Now I do LASSO -Exploration
+
+```{r}
+set.seed(12345)
+logistic_model <- logistic_reg() %>% set_engine("glm")
+
+# Make sure you set reference level (the outcome you are NOT interested in)
+levels(madaproject$tb)
+
+data_cv10 <- vfold_cv(madaproject, v = 10)
+
+# Logistic LASSO Regression Model Spec
+logistic_lasso_spec_tune <- logistic_reg() %>%
+    set_engine('glmnet') %>%
+    set_args(mixture = 1, penalty = tune()) %>%
+    set_mode('classification')
+    
+# Recipe
+logistic_rec <- recipe(tb ~ ., data = madaproject) %>%
+    step_normalize(all_numeric_predictors()) %>% 
+    step_dummy(all_nominal_predictors())
+
+# Workflow (Recipe + Model)
+log_lasso_wf <- workflow() %>% 
+    add_model(logistic_lasso_spec_tune) %>%
+    add_recipe(logistic_rec) 
+
+# Tune Model (trying a variety of values of Lambda penalty)
+lasso_grid <- grid_regular(
+  penalty(range = c(-3, 1)), 
+  levels = 30)
+
+tune_outputlasso <- tune_grid( 
+  log_lasso_wf, # workflow
+  resamples = data_cv10, # cv folds
+  metrics = metric_set(roc_auc,accuracy),
+  control = control_resamples(save_pred = TRUE),
+  grid = lasso_grid # lasso penalty grid defined above
+)
+
+# Visualize Model Evaluation Metrics from Tuning
+autoplot(tune_outputlasso) + theme_classic()
+
+# Select Penalty
+best_se_penalty <- select_by_one_std_err(tune_outputlasso, metric = 'roc_auc', desc(penalty)) # choose penalty value based on the largest penalty within 1 se of the lowest CV roc_auc
+best_se_penalty
+
+# Fit Final Model
+final_fit_lasso <- finalize_workflow(log_lasso_wf, best_se_penalty) %>% # incorporates penalty value to workflow 
+fit(data = madaproject)
+```
+
+```{r}
+# Get the best parameters
+best_params <- show_best(tune_outputlasso, metric = "roc_auc") %>%
+               slice(1)
+
+# Finalize workflow with best parameters
+final_lasso_wf <- finalize_workflow(log_lasso_wf, best_params)
+
+# Fit model to training data
+lasso_train_fit <- fit(final_lasso_wf, data = madaproject)
+
+# Extract fitted model
+fitted_model <- extract_fit_parsnip(lasso_train_fit)
+
+# Extract selected variables
+selected_variables <- tidy(fitted_model$fit) %>%
+                      filter(!is.na(estimate) & estimate != 0) %>%
+                      pull(term)
+
+# Print selected variables
+print(selected_variables)
+
+```
+I see that only one variable is dropped remaining with a total of 13 covariates.

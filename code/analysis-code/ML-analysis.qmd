@@ -50,7 +50,7 @@ options(warn = defaultW)
 
 ```{r}
 #Path to data. Note the use of the here() package and not absolute paths
-data_location <- here::here("data","processed-data","data2.rds")
+data_location <- here::here("data","processed-data","madaproject.rds")
 #load data
 # Loading the needed dataset
 madaproject <- readRDS(data_location)
@@ -97,7 +97,8 @@ ntest = nrow(test)
 ```
 
 
-FITTING OF ALL MODELS 
+## FITTING OF ALL MODELS 
+
 Fitting the null model
 ```{r}
 #Fit a null model to the outcome tb
@@ -135,8 +136,8 @@ logistic_rec <- recipe(tb ~ ., data = train) %>%
 
 # Workflow (Recipe + Model)
 log_lasso_wf <- workflow() %>% 
-    add_recipe(logistic_rec) %>%
-    add_model(logistic_lasso_spec_tune)     
+    add_model(logistic_lasso_spec_tune) %>%
+    dd_recipe(logistic_rec) 
 
 # Tune Model (trying a variety of values of Lambda penalty)
 lasso_grid <- grid_regular(
@@ -219,7 +220,7 @@ rf_wf <- workflow() %>%
     add_recipe(rf_rec) %>%
     add_model(rf_spec_tune)     
 
-# Tune Model (trying a variety of values of mtry and trees)
+# Setup grid tune for  Model
 rf_grid <- grid_regular(
   mtry(range = c(1,7)), # adjusting based on number of predictors
   trees(range = c(1, 21)), # adjust the range as needed
@@ -235,8 +236,6 @@ tune_outputrf <- tune_grid(
   grid = rf_grid, # parameter grid defined above
 )
 print(tune_outputrf)
-# Visualize Model Evaluation Metrics from Tuning
-#autoplot(tune_outputrf)
 
 # Fit Final Model
 final_fit_rf <- finalize_workflow(rf_wf, select_best(tune_outputrf, "roc_auc")) %>% 
@@ -274,9 +273,6 @@ conf_matrf <- pred_train %>%
 
 # Convert confusion matrix to data frame
 rfconf_table <- as.data.frame(conf_matrf$table)
-
-# Create a flextable from the data frame
-#rfconf_table <- flextable(conf_dfrf)
 
 # Print the table
 print(rfconf_table)
@@ -556,7 +552,7 @@ saveRDS(model_perfomance_test, file = summarytable_file)
 
 ```
 
-The evaluation of machine learning models' performance on test data is pivotal for gauging their efficacy and generalization capabilities. In this study, conducted to assess predictive accuracy, the models were measured using metrics such as accuracy and Area Under the Curve (AUC). The Lasso, Random Forest, and Support Vector models were compared against a Null Model, with their respective performance metrics outlined. The results revealed a notable performance gap between the advanced models and the Null Model. Specifically, the Random Forest model exhibited superior performance, achieving an accuracy of 81.57% and an AUC of 0.887. In contrast, the Lasso and Support Vector models attained accuracies of 80.26% and 79.68%, with corresponding AUC values of 0.889 and 0.882, respectively.
+
 
 
 

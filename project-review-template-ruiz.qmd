@@ -1,0 +1,192 @@
+---
+title: Project Review Template 
+author: Andrew Ruiz
+date: 2024-04-25
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+Title of project:
+CASE DETECTION OF TUBERCULOSIS PATIENTS USING MACHINE-LEARNING
+Name of project author(s):
+Patrick Kaggwa
+Name of project reviewer:
+Andrew Ruiz
+
+# Instructions
+
+Write your comments and feedback below for each section/component of the project. The goal should be to help the author improve their project. Make comments as constructive and actionable as possible. You can provide both criticism and praise.
+
+For each component, pick one summary statement by deleting the ones that do not apply and keeping only the one that you think most closely summarizes a given component. 
+
+Make sure your final document compiles/renders into a readable, well-formatted html document.
+
+Delete any sections/text of this template that are not part of your final review document. (Including these instructions.)
+
+
+# Specific project content evaluation
+Evaluate the different parts of the project by filling in the sections below.
+
+
+## Background, Context and Motivation
+How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+### Feedback and Comments
+
+The background, context and motivation were clear and to the point. However, this section could benefit from more details on the potential impact the work. Currently, the problem is that TB cases are not idenitified quickly enough and there are undiagnosed cases. Early detection could help reduce the spread of TB as well. 
+
+### Summary assessment (PICK ONE, DELETE THE OTHERS)
+* strong contextualization and motivation
+
+
+## Question description
+How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+
+### Feedback and Comments
+
+The questions are well defined, but could benefit from some refinement. Consider adding a narrower focus to question 1. "How can (TB) prediction be modeled using early clinical patient data from Kampala residents who visited the IDRC between 2011 and 2018, presenting with a persistent cough lasting two weeks or more?"
+
+### Summary assessment
+* question/hypotheses fully clear
+
+
+## Data description
+How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+### Feedback and Comments
+data is well described and the codebook is available. 
+ The data table on page 4 is a little confusing to read. It could be improved by adding more descriptive headers and using a format that clearly defines the rows. The NAs in the columns do not seem necessary
+### Summary assessment
+* source and overall structure of data well explained
+
+
+## Data wrangling and exploratory analysis
+How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+### Feedback and Comments
+
+The EDA seems reasonable and is well documented. The objectives of each step were clear. The coding and processes were uncluttered and easy to follow. 
+
+### Summary assessment
+* essentially no weaknesses in wrangling and exploratory component
+
+
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+The analysis seems appropriate and the metrics were clearly defined. 
+
+### Summary assessment
+* strong and reasonable analysis
+
+## Presentation
+How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+### Feedback and Comments
+Teh results are generally well presented. However, the figures should include title or captions. Because the graphs look very similar, it might be helpful to show them faceted or on the same figure for easier comparison.
+
+### Summary assessment
+* results are presented ok, with room for improvement
+
+## Discussion/Conclusions
+Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+### Feedback and Comments
+
+Discussion and conclusions are appropriate. Strengths and limitations are acknowledged. The discussion could be improved by providing more context on the implications of the findings -could this lead to cost-savings, more efficient use of resources, better patient outcomes, etc.
+
+This is not hugely important for this paper, but are current data collection methodolgies (paper vs electronic) in place a barrier for implementing models? 
+
+### Summary assessment
+* strong, complete and clear discussion
+
+
+## Further comments
+
+Well done! I suggest reviewing the Word doc for formatting issues. Spacing for in-text citations was incorrect. Some errors in punctuation and capitalization were present.
+
+# Overall project content evaluation
+Evaluate overall features of the project  by filling in the sections below.
+
+
+## Structure
+Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+### Feedback and Comments
+
+WRITE YOUR FEEDBACK HERE
+
+### Summary assessment
+* poor and confusing structure
+* mostly clear, but some confusing parts (e.g. useless files, things in the wrong folders)
+* well structured
+
+
+## Documentation 
+How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+### Feedback and Comments
+
+WRITE YOUR FEEDBACK HERE
+
+### Summary assessment
+* poorly documented
+* decently documented with some gaps
+* fully and well documented
+
+
+
+## Reproducibility
+Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+### Feedback and Comments
+
+The code ran smoothly with the exception of two errors. Both errors occurred in the analysis qmd. 
+they are outlined below.
+```{r}
+#ML_analysis.qmd
+#Line 242
+#I modified the code to this and it worked: 
+final_fit_rf <- finalize_workflow(rf_wf, select_best(tune_outputrf, metric = "roc_auc")) %>% 
+  fit(data = train)
+#Line 322
+#I modified the code to this and it worked: 
+svmfinal_fit <- finalize_workflow(svm_wf, select_best(tune_outputsvm, metric = "roc_auc")) %>% 
+  fit(data = train)
+
+
+```
+
+### Summary assessment
+* small parts not reproducible or required manual intervention 
+
+
+
+## Thoroughness
+How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+### Feedback and Comments
+
+The study addressed the objectives outlined. The technical descriptions of the models and results were appropriate. THe conclusion could be improved by explicitly addressing the questions who this work addressed the questions posed in the introduction.
+
+### Summary assessment
+* strong level of thorougness
+
+
+## Further comments
+
+The biggest distraction for me was the data table. Consider ways to improve the table and make it easier to read. 
+
+
+
+
+
